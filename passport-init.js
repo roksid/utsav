@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');   
 var User = mongoose.model('User');
 var LocalStrategy   = require('passport-local').Strategy;
+var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var bCrypt = require('bcrypt-nodejs');
 
 module.exports = function(passport){
@@ -17,6 +18,19 @@ module.exports = function(passport){
 			done(err, user);
 		});
 	});
+
+	passport.use(new GoogleStrategy({
+		clientID: "849368812312-2esa8u3p2u02sdk6b4fu83t8jacn1k9n.apps.googleusercontent.com",
+		clientSecret: "sNXvxLPc3OhuS98YX-9dDTT_",
+		callbackURL: "http://roksid.herokuapp.com/auth/google/callback"
+	  },
+	  function(accessToken, refreshToken, profile, done) {
+	  	console.log(accessToken + refreshToken + profile);
+		User.findOrCreate({ googleId: profile.id }, function (err, user) {
+		  return done(err, user);
+		});
+	  }
+	));
 
 	passport.use('login', new LocalStrategy({
 			passReqToCallback : true
